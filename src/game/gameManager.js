@@ -71,7 +71,6 @@ export default class GameManager {
             //Lose!
             i = 2;
         }
-        console.log("DEVUELVO " + i)
         return i;
     }
 

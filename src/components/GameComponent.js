@@ -57,16 +57,12 @@ export default class GameComponent extends Component {
         }
     }
     comprobarFinPartida = () => { //metodo encargado de comprobar si se gana o pierde
-        console.log("HOLA???")
         let res = this.state.gm.comprobarFinPartida();
-        console.log("resultado" + res)
         if (res === 1) {
-            console.log("deberia ganar!!!")
             
             this.setState({descripcion: <div>FIN DE LA PARTIDA! {this.state.descripcion} </div>,msgCabecera:"HAS GANADO! :D"});
             this.stopTime(false);
         } else if (res === 2) {
-            console.log("deberia perder!!!")
 
             this.setState({descripcion: <div>FIN DE LA PARTIDA! {this.state.descripcion} </div>,msgCabecera:"HAS PERDIDO... :("});
             this.stopTime(false);
