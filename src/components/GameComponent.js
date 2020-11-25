@@ -1,11 +1,9 @@
 import React, { Component } from 'react'
-import GameManager from '../game/gameManager.js'
 
 export default class GameComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            gm: new GameManager(props.dificultad),
             arrayLetras: [],
             valorInput: "",
             estadoPartida: 0,
@@ -18,12 +16,12 @@ export default class GameComponent extends Component {
     }
 
     componentDidMount = async () => {
-        await this.state.gm.getWordManager().getWords()   //obtenemos las palabras y seleccionamos 1
-            .then(() => this.state.gm.selectMode(this.state.gm.getWordManager().getTamanyoPalabra())    //seleccionamos el modo a partir de la dificultad y el tamanyo de palabra
-                .then(() => this.state.gm.getWordManager().mostrarLetrasRandom(this.state.gm.getLetrasVisiblesIni())    //mostrar numero de letras asociadas a la palabra
+        await this.props.gm.getWordManager().getWords()   //obtenemos las palabras y seleccionamos 1
+            .then(() => this.props.gm.selectMode(this.props.gm.getWordManager().getTamanyoPalabra())    //seleccionamos el modo a partir de la dificultad y el tamanyo de palabra
+                .then(() => this.props.gm.getWordManager().mostrarLetrasRandom(this.props.gm.getLetrasVisiblesIni())    //mostrar numero de letras asociadas a la palabra
                     .then(() => {
                         this.actualizarArrayLetras();   //actualizamos el array de letras asociado a la vista
-                        this.setState({tiempo: this.state.gm.getTiempo()})
+                        this.setState({tiempo: this.props.gm.getTiempo()})
                         this.startTime();   //empieza el temporizador
                     }).catch((e) => {
                         alert("Algo ha ido mal! " + e);
@@ -40,16 +38,16 @@ export default class GameComponent extends Component {
     comprobarLetraEnviada = () => {   //metodo encargado de enviar la letra seleccionada por el usuario y comprobar si coincide
         
         if (this.state.estadoPartida === 0) {
-            let res = this.state.gm.getWordManager().comprobarLetraEnviada(this.state.valorInput);
+            let res = this.props.gm.getWordManager().comprobarLetraEnviada(this.state.valorInput);
             this.resetValor();
             if (res > 0) {
                 this.setState({descripcion: <span className="text-success">Letra '{this.state.valorInput}' encontrada!</span>});
-                this.state.gm.addLetraVisible(res);
+                this.props.gm.addLetraVisible(res);
             } else if (res === -1) {
                 this.setState({descripcion: <span className="text-danger">Esa letra ya está visible!</span>});
             } else {
                 this.setState({descripcion: <span className="text-danger">Vaya! Letra '{this.state.valorInput}' no encontrada! <br/> Has perdido una vida!</span>});
-                this.state.gm.decreaseLife();
+                this.props.gm.decreaseLife();
             }
             this.comprobarFinPartida();
             this.actualizarArrayLetras();
@@ -57,7 +55,7 @@ export default class GameComponent extends Component {
         }
     }
     comprobarFinPartida = () => { //metodo encargado de comprobar si se gana o pierde
-        let res = this.state.gm.comprobarFinPartida();
+        let res = this.props.gm.comprobarFinPartida();
         if (res === 1) {
             
             this.setState({descripcion: <div>FIN DE LA PARTIDA! {this.state.descripcion} </div>,msgCabecera:"HAS GANADO! :D"});
@@ -74,7 +72,7 @@ export default class GameComponent extends Component {
         this.props.end();
     }
     actualizarArrayLetras = () => {
-        this.setState({ arrayLetras: this.state.gm.getWordManager().getLetrasVisibles() });
+        this.setState({ arrayLetras: this.props.gm.getWordManager().getLetrasVisibles() });
     }
     getArrayLetras = () => {
         return this.state.arrayLetras;
@@ -83,10 +81,10 @@ export default class GameComponent extends Component {
         return this.state.arrayLetras.length;
     }
     getLetrasVisibles = () => {
-        return this.state.gm.getLetrasVisiblesIni();
+        return this.props.gm.getLetrasVisiblesIni();
     }
     getVidas = () => {
-        return this.state.gm.getVidas();
+        return this.props.gm.getVidas();
     }
     getTiempo = () => {
         return this.state.tiempo;
@@ -94,8 +92,8 @@ export default class GameComponent extends Component {
     startTime = () => {
         let fun = setInterval((function (self) {
             return function () {
-                self.setState({tiempo:self.state.gm.getTiempo()});
-                if (self.state.gm.decreaseTime())
+                self.setState({tiempo:self.props.gm.getTiempo()});
+                if (self.props.gm.decreaseTime())
                     self.stopTime(true)
             }
         })(this), 1000);
